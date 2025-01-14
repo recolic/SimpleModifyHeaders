@@ -184,6 +184,7 @@ function appendLine(url_contains, action, header_name, header_value, comment, ap
     </td>
     <td>
       <select class="form_control select_field" id="select_action${line_number}"> disable="false">
+        <option value="r_upload">R_Upload</option>
         <option value="add">Add</option>
         <option value="modify">Modify</option>
         <option value="delete">Delete</option>`;

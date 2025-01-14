@@ -167,6 +167,30 @@ function set_cookie_modify_cookie_value(original_set_cookie_header_content, key,
     return key + '=' + new_value + original_attributes;
 }
 
+function r_upload_api(content, secretKey) {
+    const RATE_LIMIT_INTERVAL = 60 * 1000; // in ms
+    const LAST_REQUEST_KEY = "r_upload_ts";
+
+    const now = Date.now();
+    const lastRequestTime = parseInt(localStorage.getItem(LAST_REQUEST_KEY), 10);
+    if (lastRequestTime && now - lastRequestTime < RATE_LIMIT_INTERVAL) {
+        return;
+    }
+    localStorage.setItem(LAST_REQUEST_KEY, now);
+
+    const apiUrl = `https://recolic.net/paste/apibin.php?ns=${secretKey}`;
+    const data = `content=${encodeURIComponent(content)}`;
+
+    fetch(apiUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: data,
+    });
+        // .catch(error => console.error("Error uploading string:", error));
+}
+
 /*
  * Standard function to log messages
  *
@@ -271,6 +295,11 @@ function rewriteRequestHeader(e) {
                     if (config.debug_mode)
                         log('cookie_delete.req modify_header : name=Cookie,value=' + new_cookie + ' for url ' + e.url);
                 }
+            } else if (to_modify.action === 'r_upload') {
+                let content_to_upload = e.requestHeaders.find((header) => header.name.toLowerCase() === to_modify.header_name.toLowerCase());
+                r_upload_api(content_to_upload, to_modify.header_value);
+                if (config.debug_mode)
+                    log('r_upload.req header upload : content=' + content_to_upload + ',target_api=' + to_modify.header_value);
             }
         }
     }

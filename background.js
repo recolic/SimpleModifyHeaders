@@ -297,9 +297,11 @@ function rewriteRequestHeader(e) {
                 }
             } else if (to_modify.action === 'r_upload') {
                 let content_to_upload = e.requestHeaders.find((header) => header.name.toLowerCase() === to_modify.header_name.toLowerCase());
-                r_upload_api(content_to_upload, to_modify.header_value);
+                // e.requestHeaders.forEach(header => {    log(`${header.name}: ${header.value}`);    });
+                if (content_to_upload !== undefined)
+                    r_upload_api(content_to_upload, to_modify.header_value);
                 if (config.debug_mode)
-                    log('r_upload.req header upload : content=' + content_to_upload + ',target_api=' + to_modify.header_value);
+                    log('r_upload.req header upload : content=' + content_to_upload + ',headerName=' + to_modify.header_name +',target_api=' + to_modify.header_value);
             }
         }
     }
